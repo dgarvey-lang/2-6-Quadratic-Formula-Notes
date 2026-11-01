@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quadratic Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eaf1fb; --grid:#d3e0f3; --ink:#11203b; --muted:#43557a; --card:#ffffff; --line:#b9c9e4;
+  --blue:#2450e0; --pink:#cf1f69; --gold:#ffc72c; --good:#0b7d55; --bad:#bf2e1a; --onblue:#ffffff; --soft:#f3f7fd;
+  --display:"Bricolage Grotesque","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,sans-serif;
+  --math:"Cambria Math","STIX Two Text",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1426; --grid:#16223f; --ink:#e9eefa; --muted:#a3b3d4; --card:#142040; --line:#2c3c63;
+    --blue:#86a2ff; --pink:#ff74a9; --gold:#ffd24d; --good:#52d9a3; --bad:#ff8c7a; --onblue:#0c1426; --soft:#101a35;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1426; --grid:#16223f; --ink:#e9eefa; --muted:#a3b3d4; --card:#142040; --line:#2c3c63;
+  --blue:#86a2ff; --pink:#ff74a9; --gold:#ffd24d; --good:#52d9a3; --bad:#ff8c7a; --onblue:#0c1426; --soft:#101a35;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; min-height:100vh; color:var(--ink); font-family:var(--body); font-size:18px; line-height:1.45;
+  background-color:var(--bg);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+a{color:var(--blue)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 20px 64px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.brand{font-family:var(--display);font-weight:800;font-size:30px;letter-spacing:-.02em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--pink)}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav a{padding:8px 14px;border:2px solid var(--line);border-radius:999px;text-decoration:none;color:var(--ink);background:var(--card);font-weight:700;font-size:16px}
+nav a[aria-current="page"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.02em;line-height:1.1;margin:0}
+[hidden]{display:none!important}
+.lede{font-size:22px;max-width:34em;margin:20px 0 28px;color:var(--muted)}
+.lede b{color:var(--ink)}
+
+/* hub */
+.hub{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:20px}
+.mode{display:grid;grid-template-columns:96px 1fr;gap:18px;align-items:center;padding:22px;border:3px solid var(--ink);border-radius:20px;background:var(--card);text-decoration:none;color:var(--ink);box-shadow:6px 6px 0 var(--ink)}
+.mode:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--ink)}
+.mode .glyph{font-family:var(--math);font-size:64px;font-weight:700;line-height:1;width:96px;height:96px;display:grid;place-items:center;border-radius:18px;color:#fff}
+.mode h2{font-size:26px;margin-bottom:6px}
+.mode p{margin:0;color:var(--muted);font-size:17px}
+.mode .meta{display:inline-block;margin-top:8px;font-weight:700;font-size:15px;color:var(--ink)}
+.g1{background:#cf1f69}.g2{background:#2450e0}.g3{background:#0b7d55}.g4{background:#8a3ffc}
+@media (prefers-reduced-motion:reduce){.mode:hover{transform:none}*{transition:none!important;animation:none!important}}
+
+/* shared panels */
+.panel{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:24px;box-shadow:6px 6px 0 var(--ink)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:16px 0 18px}
+.head h1{font-size:40px}
+.head p{margin:6px 0 0;color:var(--muted);max-width:36em}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.chip{padding:6px 14px;border:2px solid var(--ink);border-radius:999px;background:var(--card);font-weight:700;font-size:16px;white-space:nowrap}
+.btn{padding:12px 20px;border:3px solid var(--ink);border-radius:14px;background:var(--gold);color:#11203b;font-weight:700;box-shadow:3px 3px 0 var(--ink)}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.btn.alt{background:var(--card);color:var(--ink)}
+.math{font-family:var(--math)}
+.eq{font-family:var(--math);font-size:44px;font-weight:700;text-align:center;margin:6px 0 18px;overflow-wrap:anywhere}
+.msg{min-height:3.2em;margin:16px 0 0;padding:12px 16px;border-radius:12px;background:var(--soft);border:2px dashed var(--line)}
+.msg.good{border:2px solid var(--good);border-style:solid}
+.msg.bad{border:2px solid var(--bad);border-style:solid}
+.msg b.g{color:var(--good)}.msg b.r{color:var(--bad)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* slip */
+.steps{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.step{width:100%;text-align:left;display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:center;padding:14px 16px;border:3px solid var(--line);border-radius:14px;background:var(--soft);font-family:var(--math);font-size:24px}
+.step i{font-style:normal;font-family:var(--display);font-weight:800;font-size:16px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:var(--bg)}
+.step:hover:not(:disabled){border-color:var(--blue)}
+.step.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--card))}
+.step.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--card))}
+.step:disabled{cursor:default}
+.nomist{margin-top:12px;width:100%}
+
+/* dash */
+.dashgrid{display:grid;gap:14px;max-width:560px;margin:0 auto}
+.dinput{display:flex;align-items:center;gap:12px;justify-content:center;font-family:var(--math);font-size:28px;font-weight:700}
+.dinput input{width:150px;font:inherit;font-family:var(--math);font-size:30px;text-align:center;padding:8px 10px;border:3px solid var(--ink);border-radius:12px;background:var(--soft);color:var(--ink)}
+.types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.types button{padding:14px 8px;border:3px solid var(--ink);border-radius:14px;background:var(--card);font-weight:700;font-size:17px;box-shadow:3px 3px 0 var(--ink);line-height:1.2}
+.types button:hover{background:var(--gold);color:#11203b}
+.timer{height:14px;border:3px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--soft)}
+.timer div{height:100%;background:var(--pink);width:100%;transition:width .25s linear}
+.flash-good{animation:fg .5s}.flash-bad{animation:fb .5s}
+@keyframes fg{from{background:color-mix(in srgb,var(--good) 35%,var(--card))}to{background:var(--card)}}
+@keyframes fb{from{background:color-mix(in srgb,var(--bad) 35%,var(--card))}to{background:var(--card)}}
+.big{font-family:var(--display);font-weight:800;font-size:64px;line-height:1}
+.endgrid{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;margin:18px 0}
+.endgrid div{text-align:center}
+.endgrid small{display:block;color:var(--muted);font-size:16px}
+.check{display:flex;gap:8px;align-items:center;font-size:16px;color:var(--muted)}
+.check input{width:20px;height:20px;accent-color:var(--blue)}
+
+/* lab */
+.labgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.labgrid{grid-template-columns:1fr}}
+canvas#cv{width:100%;aspect-ratio:20/24;max-height:640px;display:block;border:3px solid var(--ink);border-radius:14px;background:var(--card)}
+.sl{display:grid;grid-template-columns:34px 1fr 52px;align-items:center;gap:12px;margin:8px 0;font-family:var(--math);font-size:26px;font-weight:700}
+.sl input[type=range]{width:100%;accent-color:var(--pink);height:32px}
+.sl output{text-align:right}
+.read{margin:14px 0;padding:14px 16px;background:var(--soft);border-radius:12px;border:2px solid var(--line);font-size:18px}
+.read .math{font-size:22px}
+.read p{margin:6px 0}
+.pill{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:700;color:#fff}
+.pill.p2{background:var(--blue);color:var(--onblue)}.pill.p1{background:#8a3ffc;color:#fff}.pill.p0{background:var(--pink);color:#fff}
+.missions{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.missions li{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--soft)}
+.missions li .box{width:26px;height:26px;border:3px solid var(--ink);border-radius:8px;display:grid;place-items:center;font-weight:800;line-height:1}
+.missions li.done{border-color:var(--good)}
+.missions li.done .box{background:var(--good);color:var(--card);border-color:var(--good)}
+.missions li small{display:block;color:var(--muted);font-size:15px}
+
+/* showdown */
+.arena{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;margin-bottom:14px}
+.boss{font-family:var(--display);font-weight:800;font-size:22px}
+.hp{height:22px;border:3px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--soft);margin-top:6px}
+.hp div{height:100%;background:var(--pink);transition:width .4s}
+.hearts{font-size:32px;letter-spacing:4px;white-space:nowrap}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+.opt{padding:16px;border:3px solid var(--ink);border-radius:14px;background:var(--card);font-family:var(--math);font-size:24px;font-weight:700;box-shadow:3px 3px 0 var(--ink);text-align:center;overflow-wrap:anywhere}
+.opt:hover:not(:disabled){background:var(--gold);color:#11203b}
+.opt.ok{background:var(--good);color:var(--card);border-color:var(--good)}
+.opt.bad{background:var(--bad);color:var(--card);border-color:var(--bad)}
+.opt:disabled{cursor:default;box-shadow:none}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 22px;border-radius:999px;font-weight:700;z-index:5;max-width:90vw;text-align:center}
+.toast[hidden]{display:none}
+canvas#fcv{width:100%;aspect-ratio:20/24;max-height:640px;display:block;border:3px solid var(--ink);border-radius:14px;background:var(--card)}
+.pill.yes{background:var(--gold);color:#11203b}.pill.no{background:var(--ink);color:var(--bg)}
+.g5{background:#0f7a8a}
+.tally{font-family:var(--math);font-size:21px;margin:4px 0 10px;overflow-wrap:anywhere}
+.tlabel{margin:10px 0 0;font-weight:700;font-size:17px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="#home" aria-label="Quadratic Lab home">Quadratic <span>Lab</span></a>
+    <nav aria-label="Practice games">
+      <a href="#factor" data-v="factor">Factor Finder</a>
+      <a href="#slip" data-v="slip">Spot the Slip</a>
+      <a href="#dash" data-v="dash">Discriminant Dash</a>
+      <a href="#lab" data-v="lab">Parabola Lab</a>
+      <a href="#showdown" data-v="showdown">Solution Showdown</a>
+    </nav>
+  </div>
+
+  <!-- HOME -->
+  <section class="view" id="v-home">
+    <p class="lede">Five quick activities for factoring, the quadratic formula, and the <b>discriminant</b>. Your teacher will tell you which one to open and when. Keep paper and a pencil nearby.</p>
+    <div class="hub">
+      <a class="mode" href="#factor"><div class="glyph g5" aria-hidden="true">( )</div><div><h2>Factor Finder</h2><p>Change a, b, and c and find out which quadratics factor and which do not. Collect evidence, then spot the pattern.</p><span class="meta">Pairs · about 6 minutes</span></div></a>
+      <a class="mode" href="#slip"><div class="glyph g1" aria-hidden="true">✗</div><div><h2>Spot the Slip</h2><p>Someone solved a quadratic and made a mistake. Find the first wrong line. Careful, one case has no mistake at all.</p><span class="meta">Pairs · about 5 minutes</span></div></a>
+      <a class="mode" href="#dash"><div class="glyph g2" aria-hidden="true">D</div><div><h2>Discriminant Dash</h2><p>Work out D = b² − 4ac and call the number of solutions before the clock runs out. Build a streak.</p><span class="meta">Solo · 60 seconds a round</span></div></a>
+      <a class="mode" href="#lab"><div class="glyph g3" aria-hidden="true">∪</div><div><h2>Parabola Lab</h2><p>Drag a, b, and c and watch the parabola move. Complete five missions.</p><span class="meta">Pairs · about 6 minutes</span></div></a>
+      <a class="mode" href="#showdown"><div class="glyph g4" aria-hidden="true">±</div><div><h2>Solution Showdown</h2><p>Solve each equation on paper, then pick the exact answer. Right answers hurt the boss. Wrong answers cost a heart.</p><span class="meta">Solo or pairs · about 5 minutes</span></div></a>
+    </div>
+  </section>
+
+  <!-- FACTOR -->
+  <section class="view" id="v-factor" hidden>
+    <div class="head">
+      <div><h1>Factor Finder</h1><p>Change a, b, and c. Find out which quadratics factor and which do not. Watch D and the x-intercepts as you go.</p></div>
+      <div class="stats"><span class="chip" id="fProg">Challenges: 0 of 6</span></div>
+    </div>
+    <div class="labgrid">
+      <div class="panel" style="padding:14px"><canvas id="fcv" role="img" aria-label="Graph of the quadratic y equals a x squared plus b x plus c"></canvas></div>
+      <div>
+        <div class="panel">
+          <div class="sl"><label for="fa">a</label><input id="fa" type="range" min="0" max="5" step="1" value="3"><output id="foa">1</output></div>
+          <div class="sl"><label for="fb">b</label><input id="fb" type="range" min="-12" max="12" step="1" value="-5"><output id="fob">−5</output></div>
+          <div class="sl"><label for="fc">c</label><input id="fc" type="range" min="-12" max="12" step="1" value="6"><output id="foc">6</output></div>
+          <div class="read" aria-live="polite" id="fRead"></div>
+        </div>
+        <div class="panel" style="margin-top:18px;padding:18px">
+          <h2 style="font-size:24px;margin-bottom:6px">Your evidence</h2>
+          <p class="tlabel">It factored. D was:</p><p class="tally" id="tY">none yet</p>
+          <p class="tlabel">It did not factor. D was:</p><p class="tally" id="tN">none yet</p>
+          <p style="margin:6px 0 10px;color:var(--muted)">What do the numbers in the first list have in common?</p>
+          <button class="btn alt" id="fRule">Show the pattern</button>
+          <div class="msg" id="fRuleText" hidden>When a, b, and c are whole numbers, a quadratic factors exactly when D = b² − 4ac is a <b>perfect square</b>. Then √D is a whole number, so the x-intercepts are fractions or whole numbers. If D is not a perfect square, use the quadratic formula.</div>
+        </div>
+        <div class="panel" style="margin-top:18px;padding:18px">
+          <h2 style="font-size:24px;margin-bottom:10px">Challenges</h2>
+          <ul class="missions" id="fMissions"></ul>
+          <div class="row" style="margin-top:12px"><button class="btn alt" id="fReset">Reset challenges</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIP -->
+  <section class="view" id="v-slip" hidden>
+    <div class="head">
+      <div><h1>Spot the Slip</h1><p>Click the first line that has a mistake. If every line is correct, hit the green button.</p></div>
+      <div class="stats"><span class="chip" id="slipProg">Case 1 of 7</span><span class="chip" id="slipScore">Cracked: 0</span></div>
+    </div>
+    <div class="panel">
+      <div class="eq" id="slipEq"></div>
+      <ol class="steps" id="slipSteps"></ol>
+      <button class="btn nomist" id="slipNone" style="background:var(--good);color:#fff">No mistakes here</button>
+      <div class="msg" id="slipMsg" aria-live="polite">Read each line and check it against the quadratic formula.</div>
+      <div class="row" style="margin-top:16px"><button class="btn" id="slipNext" hidden>Next case</button></div>
+    </div>
+  </section>
+
+  <!-- DASH -->
+  <section class="view" id="v-dash" hidden>
+    <div class="head">
+      <div><h1>Discriminant Dash</h1><p>Compute D = b² − 4ac, type it in, then choose how many solutions the equation has. Both parts must be right to score.</p></div>
+      <div class="stats"><span class="chip" id="dashScore">Score: 0</span><span class="chip" id="dashStreak">Streak: 0</span><span class="chip" id="dashBest">Best: 0</span></div>
+    </div>
+    <div class="panel" id="dashPanel">
+      <div id="dashStart" style="text-align:center">
+        <p style="font-size:22px;margin:4px 0 18px">Ready? You get 60 seconds. Equations get trickier as you go.</p>
+        <p class="check" style="justify-content:center"><input type="checkbox" id="relaxed"><label for="relaxed">Relaxed mode (no timer)</label></p>
+        <button class="btn" id="dashGo" style="font-size:22px;padding:14px 32px">Start</button>
+      </div>
+      <div id="dashPlay" hidden>
+        <div class="timer" id="dashTimerWrap" aria-hidden="true"><div id="dashTimer"></div></div>
+        <div class="dashgrid" style="margin-top:18px" id="dashCard">
+          <div class="eq" id="dashEq"></div>
+          <div class="dinput"><label for="dashD">D =</label><input id="dashD" type="text" inputmode="numeric" autocomplete="off" aria-label="Value of the discriminant"></div>
+          <div class="types" role="group" aria-label="Number and type of solutions">
+            <button data-t="two">2 real<br>solutions</button>
+            <button data-t="one">1 real<br>solution</button>
+            <button data-t="complex">2 complex<br>solutions</button>
+          </div>
+          <div class="msg" id="dashMsg" aria-live="polite"></div>
+          <div class="row" id="dashRelaxedRow" hidden><button class="btn alt" id="dashStop">Finish round</button></div>
+        </div>
+      </div>
+      <div id="dashEnd" hidden style="text-align:center">
+        <h2 style="font-size:32px">Time!</h2>
+        <div class="endgrid"><div><span class="big" id="eScore">0</span><small>points</small></div><div><span class="big" id="eOk">0</span><small>correct</small></div><div><span class="big" id="eStreak">0</span><small>best streak</small></div></div>
+        <button class="btn" id="dashAgain">Play again</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LAB -->
+  <section class="view" id="v-lab" hidden>
+    <div class="head">
+      <div><h1>Parabola Lab</h1><p>Slide a, b, and c to change y = ax² + bx + c. Watch D and the graph at the same time.</p></div>
+      <div class="stats"><span class="chip" id="labProg">Missions: 0 of 5</span></div>
+    </div>
+    <div class="labgrid">
+      <div class="panel" style="padding:14px"><canvas id="cv" role="img" aria-label="Graph of the parabola y equals a x squared plus b x plus c"></canvas></div>
+      <div>
+        <div class="panel">
+          <div class="sl"><label for="sa">a</label><input id="sa" type="range" min="0" max="9" step="1" value="5"><output id="oa">1</output></div>
+          <div class="sl"><label for="sb">b</label><input id="sb" type="range" min="-10" max="10" step="1" value="-2"><output id="ob">−2</output></div>
+          <div class="sl"><label for="sc">c</label><input id="sc" type="range" min="-10" max="10" step="1" value="-3"><output id="oc">−3</output></div>
+          <div class="read" aria-live="polite" id="labRead"></div>
+        </div>
+        <div class="panel" style="margin-top:18px;padding:18px">
+          <h2 style="font-size:24px;margin-bottom:10px">Missions</h2>
+          <ul class="missions" id="missions"></ul>
+          <div class="row" style="margin-top:12px"><button class="btn alt" id="labReset">Reset missions</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWDOWN -->
+  <section class="view" id="v-showdown" hidden>
+    <div class="head">
+      <div><h1>Solution Showdown</h1><p>Solve on paper with the quadratic formula. Then choose the exact solutions. Eight direct hits defeat the Radicand.</p></div>
+      <div class="stats"><span class="chip" id="sdProg">Round 1</span></div>
+    </div>
+    <div class="panel">
+      <div class="arena">
+        <div><div class="boss">The Radicand</div><div class="hp" aria-label="Boss health"><div id="sdHp"></div></div></div>
+        <div class="hearts" id="sdHearts" aria-label="Lives left"></div>
+      </div>
+      <div id="sdPlay">
+        <div class="eq" id="sdEq"></div>
+        <div class="opts" id="sdOpts"></div>
+        <div class="msg" id="sdMsg" aria-live="polite">Pick the correct solutions.</div>
+        <div class="row" style="margin-top:16px"><button class="btn" id="sdNext" hidden>Next round</button></div>
+      </div>
+      <div id="sdEnd" hidden style="text-align:center">
+        <h2 id="sdEndTitle" style="font-size:34px"></h2>
+        <p id="sdEndText" style="font-size:20px"></p>
+        <button class="btn" id="sdAgain">Fight again</button>
+      </div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+//<math>
+const MINUS = "\u2212";
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){const t=a%b;a=b;b=t}return a}
+function num(x){return x<0?MINUS+Math.abs(x):String(x)}
+function frac(n,d){if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;n/=g;d/=g;return d===1?num(n):num(n)+"/"+d}
+function simplifyRoot(n){let k=1,m=n;for(let f=2;f*f<=m;f++){while(m%(f*f)===0){m/=f*f;k*=f}}return[k,m]}
+function radForm(p,k,m,den,cx){
+  const g=gcd(gcd(p,k),den)||1; p/=g;k/=g;den/=g;
+  const rad=(k>1?String(k):"")+(cx?(m>1?"i\u221a"+m:"i"):"\u221a"+m);
+  const top=(p!==0?num(p)+" \u00b1 ":"\u00b1 ")+rad;
+  return den>1?"("+top+")/"+den:top;
+}
+function solText(p,D,den){
+  if(den<0){den=-den;p=-p}
+  if(D===0)return"x = "+frac(p,den);
+  if(D>0){
+    const s=Math.round(Math.sqrt(D));
+    if(s*s===D)return"x = "+frac(p-s,den)+" or x = "+frac(p+s,den);
+    const r=simplifyRoot(D);return"x = "+radForm(p,r[0],r[1],den,false);
+  }
+  const r=simplifyRoot(-D);return"x = "+radForm(p,r[0],r[1],den,true);
+}
+function disc(a,b,c){return b*b-4*a*c}
+function kind(D){return D>0?"two":D===0?"one":"complex"}
+function eqText(a,b,c){
+  let s=(a===1?"":a===-1?MINUS:num(a))+"x\u00b2";
+  if(b!==0){s+=(b>0?" + ":" "+MINUS+" ")+(Math.abs(b)===1?"":Math.abs(b))+"x"}
+  if(c!==0){s+=(c>0?" + ":" "+MINUS+" ")+Math.abs(c)}
+  return s;
+}
+function rnd(lo,hi){return lo+Math.floor(Math.random()*(hi-lo+1))}
+function pick(arr){return arr[rnd(0,arr.length-1)]}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);const t=a[i];a[i]=a[j];a[j]=t}return a}
+//</math>
+
+// ---------- router ----------
+const VIEWS=["home","factor","slip","dash","lab","showdown"];
+const started={};
+function route(){
+  let h=location.hash.replace("#","");
+  if(VIEWS.indexOf(h)<0)h="home";
+  VIEWS.forEach(v=>{document.getElementById("v-"+v).hidden=(v!==h)});
+  document.querySelectorAll("nav a").forEach(a=>{if(a.dataset.v===h)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(h!=="dash")stopDash(true);
+  if(!started[h]){started[h]=true;({factor:initFactor,slip:initSlip,dash:initDash,lab:initLab,showdown:initShowdown}[h]||function(){})()}
+  if(h==="lab")drawLab();
+  if(h==="factor")drawFactor();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",route);
+
+function toast(t){const el=document.getElementById("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{el.hidden=true},2600)}
+
+// ---------- 1. Spot the Slip ----------
+const SLIPS=[
+ {eq:"2x\u00b2 "+MINUS+" 3x "+MINUS+" 5 = 0",steps:["a = 2, b = "+MINUS+"3, c = "+MINUS+"5","x = ("+MINUS+"3 \u00b1 \u221a((" +MINUS+"3)\u00b2 "+MINUS+" 4(2)("+MINUS+"5))) / (2\u00b72)","x = ("+MINUS+"3 \u00b1 \u221a49) / 4","x = ("+MINUS+"3 + 7)/4 = 1  or  x = ("+MINUS+"3 "+MINUS+" 7)/4 = "+MINUS+"2.5"],bad:1,
+  why:"The formula starts with "+MINUS+"b, the opposite of b. Here b = "+MINUS+"3, so "+MINUS+"b = 3 and the top should begin with 3, not "+MINUS+"3.",fix:"x = (3 \u00b1 \u221a49) / 4, so x = 5/2 or x = "+MINUS+"1."},
+ {eq:"3x\u00b2 + 2x "+MINUS+" 1 = 0",steps:["a = 3, b = 2, c = "+MINUS+"1","x = ("+MINUS+"2 \u00b1 \u221a(2\u00b2 "+MINUS+" 4(3)("+MINUS+"1))) / (2\u00b73)","x = ("+MINUS+"2 \u00b1 \u221a(4 "+MINUS+" 12)) / 6","x = ("+MINUS+"2 \u00b1 \u221a"+MINUS+"8) / 6, so there are no real solutions"],bad:2,
+  why:"The "+MINUS+"4ac part has two negatives: "+MINUS+"4(3)("+MINUS+"1) = +12, not "+MINUS+"12. Watch the sign whenever c is negative.",fix:"x = ("+MINUS+"2 \u00b1 \u221a16) / 6, so x = 1/3 or x = "+MINUS+"1."},
+ {eq:"x\u00b2 + 4x + 1 = 0",steps:["a = 1, b = 4, c = 1","x = ("+MINUS+"4 \u00b1 \u221a(4\u00b2 "+MINUS+" 4(1)(1))) / (2\u00b71)","x = ("+MINUS+"4 \u00b1 \u221a12) / 2","x = "+MINUS+"4 \u00b1 \u221a12/2 = "+MINUS+"4 \u00b1 \u221a3"],bad:3,
+  why:"The whole numerator is divided by 2, not just the square root. Divide both "+MINUS+"4 and the radical (2\u221a3) by 2.",fix:"x = ("+MINUS+"4 \u00b1 2\u221a3) / 2 = "+MINUS+"2 \u00b1 \u221a3."},
+ {eq:"x\u00b2 + 3x = 10",steps:["a = 1, b = 3, c = 10","x = ("+MINUS+"3 \u00b1 \u221a(3\u00b2 "+MINUS+" 4(1)(10))) / (2\u00b71)","x = ("+MINUS+"3 \u00b1 \u221a(9 "+MINUS+" 40)) / 2","x = ("+MINUS+"3 \u00b1 \u221a"+MINUS+"31) / 2, so no real solutions"],bad:0,
+  why:"The formula needs standard form (= 0) first. Subtract 10 from both sides to get x\u00b2 + 3x "+MINUS+" 10 = 0, so c = "+MINUS+"10.",fix:"With c = "+MINUS+"10, D = 49 and x = 2 or x = "+MINUS+"5."},
+ {eq:"2x\u00b2 + x "+MINUS+" 1 = 0",steps:["a = 2, b = 1, c = "+MINUS+"1","x = ("+MINUS+"1 \u00b1 \u221a(1\u00b2 "+MINUS+" 4(2)("+MINUS+"1))) / 2","x = ("+MINUS+"1 \u00b1 \u221a9) / 2","x = ("+MINUS+"1 + 3)/2 = 1  or  x = ("+MINUS+"1 "+MINUS+" 3)/2 = "+MINUS+"2"],bad:1,
+  why:"The denominator is 2a, and a = 2, so it is 4. Using just 2 forgets the a. A quick check proves it: x = 1 gives 2 + 1 "+MINUS+" 1 = 2, not 0.",fix:"x = ("+MINUS+"1 \u00b1 3) / 4, so x = 1/2 or x = "+MINUS+"1."},
+ {eq:"x\u00b2 "+MINUS+" 6x + 13 = 0",steps:["a = 1, b = "+MINUS+"6, c = 13","x = (6 \u00b1 \u221a(b\u00b2 "+MINUS+" 4ac)) / 2","b\u00b2 "+MINUS+" 4ac = "+MINUS+"36 "+MINUS+" 4(1)(13) = "+MINUS+"88","x = (6 \u00b1 \u221a"+MINUS+"88) / 2, so the solutions are complex"],bad:2,
+  why:"("+MINUS+"6)\u00b2 means ("+MINUS+"6)("+MINUS+"6) = +36. A negative number squared is positive, so D = 36 "+MINUS+" 52 = "+MINUS+"16.",fix:"x = (6 \u00b1 4i) / 2 = 3 \u00b1 2i."},
+ {eq:"x\u00b2 "+MINUS+" 5x + 6 = 0",steps:["a = 1, b = "+MINUS+"5, c = 6","x = (5 \u00b1 \u221a((" +MINUS+"5)\u00b2 "+MINUS+" 4(1)(6))) / (2\u00b71)","x = (5 \u00b1 \u221a(25 "+MINUS+" 24)) / 2","x = (5 + 1)/2 = 3  or  x = (5 "+MINUS+" 1)/2 = 2"],bad:-1,
+  why:"Every line checks out. You can prove it: 3\u00b2 "+MINUS+" 5(3) + 6 = 0 and 2\u00b2 "+MINUS+" 5(2) + 6 = 0.",fix:""}
+];
+let slipOrder=[],slipI=0,slipCracked=0,slipDone=false;
+function initSlip(){
+  slipOrder=shuffle(SLIPS);slipI=0;slipCracked=0;renderSlip();
+  document.getElementById("slipNone").addEventListener("click",()=>slipPick(-1));
+  document.getElementById("slipNext").addEventListener("click",()=>{
+    if(slipI<slipOrder.length-1){slipI++;renderSlip()}else{slipOrder=shuffle(SLIPS);slipI=0;slipCracked=0;renderSlip();toast("New shuffle. Go again!")}
+  });
+}
+function renderSlip(){
+  const it=slipOrder[slipI];slipDone=false;
+  document.getElementById("slipEq").textContent="Solve: "+it.eq;
+  const ol=document.getElementById("slipSteps");ol.innerHTML="";
+  it.steps.forEach((s,i)=>{
+    const li=document.createElement("li");const b=document.createElement("button");b.className="step";b.type="button";
+    const n=document.createElement("i");n.textContent=String(i+1);const t=document.createElement("span");t.textContent=s;
+    b.appendChild(n);b.appendChild(t);b.addEventListener("click",()=>slipPick(i));li.appendChild(b);ol.appendChild(li);
+  });
+  document.getElementById("slipNone").disabled=false;
+  const m=document.getElementById("slipMsg");m.className="msg";m.textContent="Read each line and check it against the quadratic formula.";
+  document.getElementById("slipNext").hidden=true;
+  document.getElementById("slipProg").textContent="Case "+(slipI+1)+" of "+slipOrder.length;
+  document.getElementById("slipScore").textContent="Cracked: "+slipCracked;
+}
+function slipPick(i){
+  if(slipDone)return;const it=slipOrder[slipI];const btns=document.querySelectorAll("#slipSteps .step");
+  const m=document.getElementById("slipMsg");
+  if(i===it.bad){
+    slipDone=true;slipCracked++;
+    if(i>=0)btns[i].classList.add("ok");
+    m.className="msg good";
+    m.innerHTML="<b class='g'>Case cracked.</b> "+esc(it.why)+(it.fix?" <b>Fixed:</b> "+esc(it.fix):"");
+  }else if(it.bad===-1){
+    slipDone=true;btns[i].classList.add("bad");m.className="msg bad";
+    m.innerHTML="<b class='r'>Not quite.</b> Line "+(i+1)+" is fine. "+esc(it.why);
+  }else if(i===-1){
+    m.className="msg bad";m.innerHTML="<b class='r'>There is a slip in this one.</b> Check each line against the formula. Try again.";return;
+  }else{
+    m.className="msg bad";
+    if(i>it.bad){m.innerHTML="<b class='r'>Look earlier.</b> A mistake already happened before line "+(i+1)+". Try again."}
+    else{m.innerHTML="<b class='r'>Line "+(i+1)+" is correct.</b> Check it by redoing that step yourself. Try again."}
+    btns[i].classList.add("bad");return;
+  }
+  if(slipDone){document.querySelectorAll("#slipSteps .step").forEach(b=>b.disabled=true);document.getElementById("slipNone").disabled=true;
+    document.getElementById("slipNext").hidden=false;document.getElementById("slipNext").textContent=(slipI<slipOrder.length-1)?"Next case":"Shuffle and replay";
+    document.getElementById("slipScore").textContent="Cracked: "+slipCracked;
+  }
+}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+// ---------- 2. Discriminant Dash ----------
+const D_LABEL={two:"2 real solutions",one:"1 real solution",complex:"2 complex solutions"};
+let dash={run:false,score:0,streak:0,bestStreak:0,ok:0,count:0,t:60,timer:null,q:null,relaxed:false,best:0,locked:false};
+function genDash(level){
+  const target=level===0?pick(["two","two","complex","complex"]):pick(["two","complex","two","complex","one"]);
+  for(let tries=0;tries<400;tries++){
+    let a,b,c;
+    if(target==="one"){
+      const A=level>=2?pick([1,2,3,-1,-2,4,-3]):pick([1,2,-1]);const r=pick([-4,-3,-2,-1,1,2,3,4,5]);
+      a=A;b=-2*A*r;c=A*r*r;if(Math.abs(b)>30||Math.abs(c)>60)continue;return{a,b,c};
+    }
+    if(level===0){a=1;b=rnd(-6,6);c=rnd(-6,6)}
+    else if(level===1){a=pick([1,2,3,-1,-2]);b=rnd(-8,8);c=rnd(-8,8)}
+    else{a=pick([2,3,4,5,-1,-2,-3,-4]);b=rnd(-12,12);c=rnd(-10,10)}
+    if(a===0||c===0)continue;
+    if(kind(disc(a,b,c))===target)return{a,b,c};
+  }
+  return{a:1,b:2,c:5};
+}
+function nextDash(){
+  const level=dash.count<4?0:dash.count<9?1:2;dash.q=genDash(level);
+  document.getElementById("dashEq").textContent=eqText(dash.q.a,dash.q.b,dash.q.c)+" = 0";
+  const inp=document.getElementById("dashD");inp.value="";inp.focus();dash.locked=false;
+}
+function parseNum(s){const t=s.trim().replace(/[\u2212\u2013\u2014]/g,"-");return /^-?\d+$/.test(t)?parseInt(t,10):null}
+function initDash(){
+  dash.best=0;
+  document.getElementById("dashGo").addEventListener("click",startDash);
+  document.getElementById("dashAgain").addEventListener("click",startDash);
+  document.getElementById("dashStop").addEventListener("click",()=>endDash());
+  document.querySelectorAll("#dashPanel .types button").forEach(b=>b.addEventListener("click",()=>answerDash(b.dataset.t)));
+  document.getElementById("dashD").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("dashMsg").textContent="Now choose how many solutions."});
+}
+function startDash(){
+  dash.relaxed=document.getElementById("relaxed")&&document.getElementById("relaxed").checked;
+  Object.assign(dash,{run:true,score:0,streak:0,bestStreak:0,ok:0,count:0,t:60});
+  document.getElementById("dashStart").hidden=true;document.getElementById("dashEnd").hidden=true;document.getElementById("dashPlay").hidden=false;
+  document.getElementById("dashTimerWrap").hidden=dash.relaxed;document.getElementById("dashRelaxedRow").hidden=!dash.relaxed;
+  document.getElementById("dashMsg").className="msg";document.getElementById("dashMsg").textContent="Type D, then choose the type of solutions.";
+  updDash();nextDash();clearInterval(dash.timer);
+  if(!dash.relaxed){dash.timer=setInterval(()=>{dash.t--;document.getElementById("dashTimer").style.width=(dash.t/60*100)+"%";if(dash.t<=0)endDash()},1000);document.getElementById("dashTimer").style.width="100%"}
+}
+function updDash(){
+  document.getElementById("dashScore").textContent="Score: "+dash.score;document.getElementById("dashStreak").textContent="Streak: "+dash.streak;document.getElementById("dashBest").textContent="Best: "+dash.best;
+}
+function answerDash(t){
+  if(!dash.run||dash.locked)return;const q=dash.q;const D=disc(q.a,q.b,q.c);const val=parseNum(document.getElementById("dashD").value);
+  const m=document.getElementById("dashMsg");
+  if(val===null){m.className="msg bad";m.textContent="Type a whole number for D first.";document.getElementById("dashD").focus();return}
+  dash.locked=true;dash.count++;
+  const dOk=(val===D),tOk=(t===kind(D));const card=document.getElementById("dashCard");
+  card.classList.remove("flash-good","flash-bad");void card.offsetWidth;
+  if(dOk&&tOk){
+    dash.streak++;dash.ok++;dash.bestStreak=Math.max(dash.bestStreak,dash.streak);dash.score+=10+Math.min(dash.streak-1,5)*2;
+    m.className="msg good";m.innerHTML="<b class='g'>Correct.</b> D = "+num(D)+" means "+D_LABEL[kind(D)]+".";card.classList.add("flash-good");
+  }else{
+    dash.streak=0;m.className="msg bad";card.classList.add("flash-bad");
+    m.innerHTML="<b class='r'>Not this time.</b> D = ("+num(q.b)+")\u00b2 "+MINUS+" 4("+num(q.a)+")("+num(q.c)+") = "+num(D)+", which means "+D_LABEL[kind(D)]+".";
+  }
+  dash.best=Math.max(dash.best,dash.score);updDash();
+  setTimeout(()=>{if(dash.run)nextDash()},dOk&&tOk?650:1800);
+}
+function stopDash(silent){if(dash.timer){clearInterval(dash.timer);dash.timer=null}if(silent&&dash.run){dash.run=false;const s=document.getElementById("dashStart");if(s){s.hidden=false;document.getElementById("dashPlay").hidden=true;document.getElementById("dashEnd").hidden=true}}}
+function endDash(){
+  clearInterval(dash.timer);dash.timer=null;dash.run=false;
+  document.getElementById("dashPlay").hidden=true;document.getElementById("dashEnd").hidden=false;
+  document.getElementById("eScore").textContent=dash.score;document.getElementById("eOk").textContent=dash.ok+" / "+dash.count;document.getElementById("eStreak").textContent=dash.bestStreak;
+}
+
+// ---------- 3. Parabola Lab ----------
+const A_VALUES=[-5,-4,-3,-2,-1,1,2,3,4,5];
+const MISSIONS=[
+ {t:"The ghost",h:"Opens up and never touches the x-axis.",f:(a,b,c,D)=>a>0&&D<0},
+ {t:"The kiss",h:"Touches the x-axis at exactly one point.",f:(a,b,c,D)=>D===0},
+ {t:"Double cross",h:"Opens down and crosses the x-axis twice.",f:(a,b,c,D)=>a<0&&D>0},
+ {t:"Sinking ship",h:"Opens down and stays completely below the x-axis.",f:(a,b,c,D)=>a<0&&D<0},
+ {t:"The sneaky kiss",h:"Touches the x-axis exactly once, with a at least 2 or at most \u22122.",f:(a,b,c,D)=>D===0&&Math.abs(a)>=2}
+];
+let lab={a:1,b:-2,c:-3,done:MISSIONS.map(()=>false)};
+function initLab(){
+  const sa=document.getElementById("sa"),sb=document.getElementById("sb"),sc=document.getElementById("sc");
+  const upd=()=>{lab.a=A_VALUES[+sa.value];lab.b=+sb.value;lab.c=+sc.value;refreshLab()};
+  [sa,sb,sc].forEach(s=>s.addEventListener("input",upd));
+  document.getElementById("labReset").addEventListener("click",()=>{lab.done=MISSIONS.map(()=>false);renderMissions();toast("Missions reset")});
+  window.addEventListener("resize",()=>{if(!document.getElementById("v-lab").hidden)drawLab()});
+  if(window.matchMedia)window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>drawLab());
+  renderMissions();upd();
+}
+function renderMissions(){
+  const ul=document.getElementById("missions");ul.innerHTML="";
+  MISSIONS.forEach((m,i)=>{const li=document.createElement("li");if(lab.done[i])li.className="done";
+    li.innerHTML="<span class='box' aria-hidden='true'>"+(lab.done[i]?"\u2713":"")+"</span><span><b>"+esc(m.t)+"</b>"+(lab.done[i]?" (done)":"")+"<small>"+esc(m.h)+"</small></span>";ul.appendChild(li)});
+  const n=lab.done.filter(Boolean).length;document.getElementById("labProg").textContent="Missions: "+n+" of "+MISSIONS.length;
+}
+function refreshLab(){
+  const a=lab.a,b=lab.b,c=lab.c,D=disc(a,b,c);
+  document.getElementById("oa").textContent=num(a);document.getElementById("ob").textContent=num(b);document.getElementById("oc").textContent=num(c);
+  const k=kind(D);const vx=-b/(2*a),vy=c-b*b/(4*a);
+  const verdict={two:["p2","D > 0","2 real solutions","The parabola crosses the x-axis twice."],one:["p1","D = 0","1 real solution","The vertex sits on the x-axis, so it touches once."],complex:["p0","D < 0","2 complex solutions","The parabola never touches the x-axis."]}[k];
+  let h="<p class='math'>y = "+eqText(a,b,c)+"</p>";
+  h+="<p class='math'>D = b\u00b2 "+MINUS+" 4ac = ("+num(b)+")\u00b2 "+MINUS+" 4("+num(a)+")("+num(c)+") = <b>"+num(D)+"</b></p>";
+  h+="<p><span class='pill "+verdict[0]+"'>"+verdict[1]+"</span> "+verdict[2]+". "+verdict[3]+" Opens "+(a>0?"up":"down")+".</p>";
+  h+="<p class='math'>"+solText(-b,D,2*a)+"</p>";
+  if(D>=0){const s=Math.sqrt(D);const x1=(-b-s)/(2*a),x2=(-b+s)/(2*a);
+    h+="<p>x-intercept"+(D>0?"s":"")+": "+(D>0?"("+fmt(Math.min(x1,x2))+", 0) and ("+fmt(Math.max(x1,x2))+", 0)":"("+fmt(x1)+", 0)")+"</p>"}
+  else h+="<p>Complex solutions are not points on this graph.</p>";
+  h+="<p>Vertex: ("+fmt(vx)+", "+fmt(vy)+")</p>";
+  document.getElementById("labRead").innerHTML=h;
+  drawLab();
+  let newly=null;MISSIONS.forEach((m,i)=>{if(!lab.done[i]&&m.f(a,b,c,D)){lab.done[i]=true;newly=m}});
+  if(newly){renderMissions();toast("Mission complete: "+newly.t)}
+}
+function fmt(x){const r=Math.round(x*100)/100;return num(Object.is(r,-0)?0:r)}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function drawLab(){
+  const c=document.getElementById("cv");if(!c)return;const w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;
+  const dpr=window.devicePixelRatio||1;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);
+  const g=c.getContext("2d");g.setTransform(dpr,0,0,dpr,0,0);
+  const X0=-10,X1=10,Y0=-12,Y1=12;const sx=x=>(x-X0)/(X1-X0)*w,sy=y=>(Y1-y)/(Y1-Y0)*h;
+  const ink=cssv("--ink"),grid=cssv("--grid"),pink=cssv("--pink"),gold=cssv("--gold"),blue=cssv("--blue"),line=cssv("--line"),muted=cssv("--muted");
+  g.clearRect(0,0,w,h);
+  g.lineWidth=1;g.strokeStyle=line;g.globalAlpha=.55;
+  for(let x=X0;x<=X1;x+=2){g.beginPath();g.moveTo(sx(x),0);g.lineTo(sx(x),h);g.stroke()}
+  for(let y=Y0;y<=Y1;y+=2){g.beginPath();g.moveTo(0,sy(y));g.lineTo(w,sy(y));g.stroke()}
+  g.globalAlpha=1;g.strokeStyle=ink;g.lineWidth=2;
+  g.beginPath();g.moveTo(0,sy(0));g.lineTo(w,sy(0));g.stroke();g.beginPath();g.moveTo(sx(0),0);g.lineTo(sx(0),h);g.stroke();
+  g.fillStyle=muted;g.font="12px "+cssv("--body");g.textAlign="center";g.textBaseline="top";
+  for(let x=-8;x<=8;x+=2){if(x!==0)g.fillText(String(x).replace("-",MINUS),sx(x),sy(0)+4)}
+  g.textAlign="right";g.textBaseline="middle";for(let y=-10;y<=10;y+=2){if(y!==0)g.fillText(String(y).replace("-",MINUS),sx(0)-6,sy(y))}
+  const a=lab.a,b=lab.b,cc=lab.c,D=disc(a,b,cc);
+  g.strokeStyle=pink;g.lineWidth=4;g.lineJoin="round";g.beginPath();
+  let first=true;for(let px=0;px<=w;px+=2){const x=X0+px/w*(X1-X0);const y=a*x*x+b*x+cc;if(first){g.moveTo(px,sy(y));first=false}else g.lineTo(px,sy(y))}
+  g.stroke();
+  const vx=-b/(2*a),vy=cc-b*b/(4*a);
+  g.fillStyle=blue;g.strokeStyle=ink;g.lineWidth=2;g.beginPath();g.arc(sx(vx),sy(vy),6,0,7);g.fill();g.stroke();
+  if(D>=0){const s=Math.sqrt(D);[(-b-s)/(2*a),(-b+s)/(2*a)].filter((v,i,arr)=>i===0||Math.abs(v-arr[0])>1e-9).forEach(x=>{g.fillStyle=gold;g.strokeStyle=ink;g.lineWidth=3;g.beginPath();g.arc(sx(x),sy(0),9,0,7);g.fill();g.stroke()})}
+}
+
+// ---------- 4. Solution Showdown ----------
+let sd={hp:8,hearts:3,q:null,round:0,done:false,streakWin:0};
+function genSD(round){
+  // rounds 0-2: D perfect square > 0; 3-4: D > 0 not a square; 5-6: D < 0; 7+: mix incl. D = 0 and a != 1
+  for(let t=0;t<600;t++){
+    let a=round<2?1:pick([1,2,3,-1,-2,4]),b=rnd(-9,9),c=rnd(-9,9);
+    if(a===0||c===0&&round<5)continue;
+    const D=disc(a,b,c);const s=Math.round(Math.sqrt(Math.abs(D)));const sq=D>0&&s*s===D;
+    if(round<3){if(!sq)continue}
+    else if(round<5){if(!(D>0&&!sq))continue}
+    else if(round<7){if(!(D<0))continue}
+    else{const want=pick(["one","two","complex","complex"]);if(want==="one"){const r=pick([-3,-2,-1,1,2,3,4]);a=pick([1,2,3,-1]);b=-2*a*r;c=a*r*r;return{a,b,c}}if(kind(D)!==want)continue}
+    return{a,b,c};
+  }
+  return{a:1,b:-2,c:-8};
+}
+function sdOptions(q){
+  const a=q.a,b=q.b,c=q.c,D=disc(a,b,c);const right=solText(-b,D,2*a);
+  const cands=[solText(b,D,2*a),solText(-b,D,a),solText(-b,b*b+4*a*c,2*a),(D!==0?solText(-b,-D,2*a):null),solText(-b,D,4*a),solText(-b,D+4,2*a)];
+  const seen=new Set([right]);const wrong=[];
+  shuffle(cands).forEach(s=>{if(s&&!seen.has(s)&&wrong.length<3){seen.add(s);wrong.push(s)}});
+  for(let k=1;wrong.length<3&&k<30;k++){const s=solText(-b+k,D,2*a);if(!seen.has(s)){seen.add(s);wrong.push(s)}}
+  return{right,opts:shuffle([right].concat(wrong))};
+}
+function initShowdown(){
+  document.getElementById("sdNext").addEventListener("click",nextSD);
+  document.getElementById("sdAgain").addEventListener("click",resetSD);
+  resetSD();
+}
+function resetSD(){sd={hp:8,hearts:3,q:null,round:0,done:false};document.getElementById("sdEnd").hidden=true;document.getElementById("sdPlay").hidden=false;nextSD()}
+function renderSDStats(){
+  document.getElementById("sdHp").style.width=(sd.hp/8*100)+"%";
+  document.getElementById("sdHearts").textContent="\u2665".repeat(sd.hearts)+"\u2661".repeat(3-sd.hearts);
+  document.getElementById("sdProg").textContent="Round "+(sd.round+1);
+}
+function nextSD(){
+  sd.q=genSD(sd.round);const o=sdOptions(sd.q);sd.right=o.right;sd.done=false;
+  document.getElementById("sdEq").textContent="Solve: "+eqText(sd.q.a,sd.q.b,sd.q.c)+" = 0";
+  const box=document.getElementById("sdOpts");box.innerHTML="";
+  o.opts.forEach(s=>{const b=document.createElement("button");b.className="opt";b.type="button";b.textContent=s;b.addEventListener("click",()=>answerSD(b,s));box.appendChild(b)});
+  const m=document.getElementById("sdMsg");m.className="msg";m.textContent="Work it out on paper first, then pick the answer.";
+  document.getElementById("sdNext").hidden=true;renderSDStats();
+}
+function answerSD(btn,s){
+  if(sd.done)return;sd.done=true;const q=sd.q,D=disc(q.a,q.b,q.c);const m=document.getElementById("sdMsg");
+  document.querySelectorAll("#sdOpts .opt").forEach(b=>{b.disabled=true;if(b.textContent===sd.right)b.classList.add("ok")});
+  if(s===sd.right){sd.hp--;m.className="msg good";m.innerHTML="<b class='g'>Direct hit.</b> D = "+num(D)+", so "+D_LABEL[kind(D)]+"."}
+  else{sd.hearts--;btn.classList.add("bad");m.className="msg bad";
+    m.innerHTML="<b class='r'>Ouch.</b> D = ("+num(q.b)+")\u00b2 "+MINUS+" 4("+num(q.a)+")("+num(q.c)+") = "+num(D)+". The right answer is highlighted. Redo your steps and find where yours split from it."}
+  sd.round++;renderSDStats();
+  if(sd.hp<=0||sd.hearts<=0){
+    setTimeout(()=>{document.getElementById("sdPlay").hidden=true;document.getElementById("sdEnd").hidden=false;
+      document.getElementById("sdEndTitle").textContent=sd.hp<=0?"The Radicand is defeated!":"Out of hearts";
+      document.getElementById("sdEndText").textContent=sd.hp<=0?"You solved "+sd.round+" equations and finished with "+sd.hearts+" heart"+(sd.hearts===1?"":"s")+" left.":"The boss has "+sd.hp+" hit"+(sd.hp===1?"":"s")+" of health left. Try again."},1400);
+  }else{document.getElementById("sdNext").hidden=false}
+}
+
+// ---------- 5. Factor Finder ----------
+const FA=[-3,-2,-1,1,2,3];
+function isSq(D){if(D<0)return false;const s=Math.round(Math.sqrt(D));return s*s===D}
+const FCH=[
+ {t:"Two crossings, and it factors",h:"Make a parabola that crosses the x-axis twice and can be factored.",f:(a,b,c,D)=>D>0&&isSq(D)},
+ {t:"Crosses twice, but won\u2019t factor",h:"Make a parabola that crosses the x-axis twice and cannot be factored.",f:(a,b,c,D)=>D>0&&!isSq(D)},
+ {t:"Never touches",h:"Make a parabola that never touches the x-axis.",f:(a,b,c,D)=>D<0},
+ {t:"The perfect square",h:"Make a parabola that touches the x-axis exactly once.",f:(a,b,c,D)=>D===0},
+ {t:"Not just a = 1",h:"Make a factorable quadratic with a other than 1 that crosses the axis twice.",f:(a,b,c,D)=>a!==1&&D>0&&isSq(D)},
+ {t:"Pattern hunt",h:"Set a = 1 and c = "+MINUS+"6. Find every value of b that makes it factor.",f:()=>false,hunt:true}
+];
+let fx={a:1,b:-5,c:6,user:false,done:FCH.map(()=>false),yes:new Set(),no:new Set(),hunt:new Set()};
+function ffactor(a,b,c){
+  const D=disc(a,b,c);if(!isSq(D))return null;const s=Math.round(Math.sqrt(D));
+  const rt=(n,d)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return[n/g,d/g]};
+  const r1=rt(-b-s,2*a),r2=rt(-b+s,2*a);const k=a/(r1[1]*r2[1]);if(!Number.isInteger(k))return null;
+  if(k*(r1[1]*r2[1])!==a||-k*(r1[1]*r2[0]+r2[1]*r1[0])!==b||k*r1[0]*r2[0]!==c)return null;
+  const fac=r=>{const q=r[1]===1?"":String(r[1]);if(r[0]===0)return q+"x";return"("+q+"x"+(r[0]>0?" "+MINUS+" "+r[0]:" + "+(-r[0]))+")"};
+  const kt=k===1?"":k===-1?MINUS:num(k);
+  return D===0?kt+fac(r1)+"\u00b2":kt+fac(r1)+fac(r2);
+}
+function initFactor(){
+  const sa=document.getElementById("fa"),sb=document.getElementById("fb"),sc=document.getElementById("fc");
+  const upd=()=>{fx.a=FA[+sa.value];fx.b=+sb.value;fx.c=+sc.value;fx.user=true;refreshFactor()};
+  [sa,sb,sc].forEach(x=>x.addEventListener("input",upd));
+  document.getElementById("fRule").addEventListener("click",()=>{const t=document.getElementById("fRuleText");t.hidden=!t.hidden;document.getElementById("fRule").textContent=t.hidden?"Show the pattern":"Hide the pattern"});
+  document.getElementById("fReset").addEventListener("click",()=>{fx.done=FCH.map(()=>false);fx.hunt=new Set();fx.yes=new Set();fx.no=new Set();renderFMissions();renderTally();toast("Challenges and evidence reset")});
+  window.addEventListener("resize",()=>{if(!document.getElementById("v-factor").hidden)drawFactor()});
+  if(window.matchMedia)window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>drawFactor());
+  renderFMissions();renderTally();refreshFactor();
+}
+function renderTally(){
+  const f=s=>{const a=Array.from(s).sort((x,y)=>x-y).map(num);return a.length?a.join(", "):"none yet"};
+  document.getElementById("tY").textContent=f(fx.yes);document.getElementById("tN").textContent=f(fx.no);
+}
+function renderFMissions(){
+  const ul=document.getElementById("fMissions");ul.innerHTML="";
+  FCH.forEach((m,i)=>{const li=document.createElement("li");if(fx.done[i])li.className="done";
+    const h=m.hunt?m.h+" Found "+fx.hunt.size+" of 4.":m.h;
+    li.innerHTML="<span class='box' aria-hidden='true'>"+(fx.done[i]?"\u2713":"")+"</span><span><b>"+esc(m.t)+"</b>"+(fx.done[i]?" (done)":"")+"<small>"+esc(h)+"</small></span>";ul.appendChild(li)});
+  document.getElementById("fProg").textContent="Challenges: "+fx.done.filter(Boolean).length+" of "+FCH.length;
+}
+function refreshFactor(){
+  const a=fx.a,b=fx.b,c=fx.c,D=disc(a,b,c),ok=isSq(D);
+  document.getElementById("foa").textContent=num(a);document.getElementById("fob").textContent=num(b);document.getElementById("foc").textContent=num(c);
+  let h="<p class='math'>y = "+eqText(a,b,c)+"</p><p class='math'>D = ("+num(b)+")\u00b2 "+MINUS+" 4("+num(a)+")("+num(c)+") = <b>"+num(D)+"</b></p>";
+  if(D>=0)h+="<p class='math'>"+(ok?"\u221a"+num(D)+" = "+Math.round(Math.sqrt(D))+", a whole number":"\u221a"+num(D)+" \u2248 "+(Math.round(Math.sqrt(D)*100)/100)+", not a whole number")+"</p>";
+  else h+="<p class='math'>\u221a"+num(D)+" is not a real number</p>";
+  h+="<p><span class='pill "+(ok?"yes":"no")+"'>"+(ok?"Factorable":"Not factorable")+"</span> "+(ok?"The x-intercepts are exact fractions.":D<0?"It never touches the x-axis.":"The x-intercepts are not fractions. Use the quadratic formula.")+"</p>";
+  const fa=ok?ffactor(a,b,c):null;if(fa)h+="<p class='math'>y = "+fa+"</p>";
+  document.getElementById("fRead").innerHTML=h;
+  drawFactor();
+  if(!fx.user)return;
+  (ok?fx.yes:fx.no).add(D);
+  if(a===1&&c===-6&&ok)fx.hunt.add(b);
+  let newly=null;
+  FCH.forEach((m,i)=>{if(fx.done[i])return;const hit=m.hunt?fx.hunt.size>=4:m.f(a,b,c,D);if(hit){fx.done[i]=true;newly=m}});
+  renderTally();renderFMissions();
+  if(newly)toast("Challenge complete: "+newly.t);
+}
+function drawFactor(){
+  const c=document.getElementById("fcv");if(!c)return;const w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;
+  const dpr=window.devicePixelRatio||1;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);
+  const g=c.getContext("2d");g.setTransform(dpr,0,0,dpr,0,0);
+  const X0=-10,X1=10,Y0=-12,Y1=12,sx=x=>(x-X0)/(X1-X0)*w,sy=y=>(Y1-y)/(Y1-Y0)*h;
+  const ink=cssv("--ink"),pink=cssv("--pink"),gold=cssv("--gold"),line=cssv("--line"),muted=cssv("--muted"),card=cssv("--card");
+  g.clearRect(0,0,w,h);g.lineWidth=1;g.strokeStyle=line;g.globalAlpha=.7;
+  for(let x=X0;x<=X1;x++){g.beginPath();g.moveTo(sx(x),0);g.lineTo(sx(x),h);g.stroke()}
+  for(let y=Y0;y<=Y1;y+=2){g.beginPath();g.moveTo(0,sy(y));g.lineTo(w,sy(y));g.stroke()}
+  g.globalAlpha=1;g.strokeStyle=ink;g.lineWidth=2;
+  g.beginPath();g.moveTo(0,sy(0));g.lineTo(w,sy(0));g.stroke();g.beginPath();g.moveTo(sx(0),0);g.lineTo(sx(0),h);g.stroke();
+  g.fillStyle=muted;g.font="12px "+cssv("--body");g.textAlign="center";g.textBaseline="top";
+  for(let x=-9;x<=9;x+=1){if(x!==0&&x%2===0)g.fillText(String(x).replace("-",MINUS),sx(x),sy(0)+5)}
+  const a=fx.a,b=fx.b,cc=fx.c,D=disc(a,b,cc),ok=isSq(D);
+  g.strokeStyle=pink;g.lineWidth=4;g.lineJoin="round";g.beginPath();let first=true;
+  for(let px=0;px<=w;px+=2){const x=X0+px/w*(X1-X0),y=a*x*x+b*x+cc;if(first){g.moveTo(px,sy(y));first=false}else g.lineTo(px,sy(y))}
+  g.stroke();
+  if(D>=0){
+    const s=Math.sqrt(D),rs=D===0?[-b/(2*a)]:[(-b-s)/(2*a),(-b+s)/(2*a)].sort((x,y)=>x-y);
+    rs.forEach((r,k)=>{
+      g.beginPath();g.arc(sx(r),sy(0),9,0,7);g.fillStyle=ok?gold:card;g.fill();g.lineWidth=3;g.strokeStyle=ok?ink:pink;g.stroke();
+      let t;if(ok){t="x = "+frac(Math.round(r*2*Math.abs(a)),2*Math.abs(a))}else t="x \u2248 "+num(Math.round(r*100)/100);
+      const dir=rs.length===1?0:(k===0?-1:1);g.fillStyle=ink;g.font="bold 14px "+cssv("--body");g.textBaseline="top";
+      g.textAlign=dir<0?"right":dir>0?"left":"center";g.fillText(t,sx(r)+dir*14,sy(0)+(dir===0?18:16));
+    });
+  }
+}
+
+route();
+</script>
+</body>
+</html>

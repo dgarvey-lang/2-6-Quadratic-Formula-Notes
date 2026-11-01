@@ -1,5 +1,14 @@
 # 2.6 Quadratic Formula Notes
 
+## Interactive HTML
+
+Open these files in any web browser (download them, then double-click):
+
+- [`html/quadratic-formula-discriminant-slides.html`](html/quadratic-formula-discriminant-slides.html): the 24-slide lesson deck, *The Quadratic Formula and the Discriminant*. Use the arrow keys or space bar to move through the slides. Press **N** to show speaker notes and **F** for full screen.
+- [`html/quadratic-lab.html`](html/quadratic-lab.html): **Quadratic Lab**, the five practice games the gold slides link to (Factor Finder, Spot the Slip, Discriminant Dash, Parabola Lab, Solution Showdown).
+
+The game links in the slides open `quadratic-lab.html` from the same folder, so keep both files together.
+
 ## The Quadratic Formula
 
 For any quadratic equation in **standard form**
